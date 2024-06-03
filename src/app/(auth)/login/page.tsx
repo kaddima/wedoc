@@ -16,7 +16,7 @@ import {
 } from "@/components/ui/form"
 import Link from "next/link"
 import Image from "next/image"
-import Logo from "../../../../public/cypresslogo.svg"
+import Logo from "../../../../public/wedoclogo.svg"
 import { Input } from "@/components/ui/input"
 import Loader from "@/components/Loader"
 import { login } from "@/lib/server-action/auth-action"
