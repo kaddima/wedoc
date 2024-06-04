@@ -15,22 +15,13 @@ export async function login({ email, password }: z.infer<typeof FormSchema>) {
     return response
 }
 
-export async function signup(formData: FormData) {
+export async function signup({ email, password }: z.infer<typeof FormSchema>) {
     const supabase = createClient()
 
-    // type-casting here for convenience
-    // in practice, you should validate your inputs
-    const data = {
-        email: formData.get('email') as string,
-        password: formData.get('password') as string,
-    }
+    const {data} = await supabase.from('profile').select('*').eq('email', email)
+    
+    if(data?.length) return {error:{message:"User already exists", data}}
+    const response = await supabase.auth.signUp({ email, password,options:{emailRedirectTo:`${process.env.NEXT_PUBLIC_SITE_URL}api/auth/callback`} })
 
-    const { error } = await supabase.auth.signUp(data)
- 
-    if (error) {
-        redirect('/error')
-    }
-
-    revalidatePath('/', 'layout')
-    redirect('/')
+    return response
 }
