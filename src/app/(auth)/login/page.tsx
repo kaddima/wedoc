@@ -48,9 +48,10 @@ const LoginPage = () => {
     const onSubmit: SubmitHandler<z.infer<typeof formSchema>> = async (formData) => {
         const {error} = await login(formData)
 
-        if(error){
+        if(error.message){
             form.reset()
             setSubmitError(error.message)
+            return
         }
 
         router.replace('/dashboard')
@@ -69,7 +70,7 @@ const LoginPage = () => {
                     An all-in-one Collaboration and Productivity Platform
                 </FormDescription>
                 <FormField disabled={isLoading} control={form.control} name="email"
-                    render={(field) => (
+                    render={({field}) => (
                         <FormItem>
                             <FormControl>
                                 <Input type="email" placeholder="Enter email" {...field} />
@@ -78,8 +79,8 @@ const LoginPage = () => {
                         </FormItem>
                     )} />
 
-                <FormField disabled={isLoading} control={form.control} name="email"
-                render={(field) => (
+                <FormField disabled={isLoading} control={form.control} name="password"
+                render={({field}) => (
                     <FormItem>
                         <FormControl>
                             <Input type="password" placeholder="Enter Password" {...field} />

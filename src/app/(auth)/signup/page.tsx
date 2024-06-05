@@ -23,6 +23,7 @@ import Loader from '@/components/Loader'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { MailCheck } from 'lucide-react'
 import { FormSchema } from '@/lib/types'
+import { signup } from '@/lib/server-action/auth-action'
 
 
 const signUpFormSchema = z.object({
@@ -44,7 +45,7 @@ const Signup = () => {
     const codeExhangeError = useMemo(() => {
         if (!searchParams) return ''
 
-        return searchParams.get('error-description')
+        return searchParams.get('error_description')
     }, [searchParams])
 
 
@@ -63,9 +64,18 @@ const Signup = () => {
     })
     const isLoading = form.formState.isSubmitting
 
-    const onSubmit = async ({email,password}:z.infer<typeof FormSchema>) => { }
+    const onSubmit = async ({email,password}:z.infer<typeof FormSchema>) => {
 
-    const signUpHandler = () => { }
+        const {error} = await signup({email,password})
+
+        if(error.message){
+            form.reset()
+            setTimeout(()=>{setSubmitError(error.message!)},0);
+            return;
+        }
+
+        setConfirmation(true)
+     }
 
     return (
         <Form {...form}>
@@ -80,7 +90,7 @@ const Signup = () => {
                     An all-in-one Collaboration and Productivity Platform
                 </FormDescription>
                 <FormField disabled={isLoading} control={form.control} name="email"
-                    render={(field) => (
+                    render={({field}) => (
                         <FormItem>
                             <FormControl>
                                 <Input type="email" placeholder="Enter email" {...field} />
@@ -89,8 +99,8 @@ const Signup = () => {
                         </FormItem>
                     )} />
 
-                <FormField disabled={isLoading} control={form.control} name="email"
-                    render={(field) => (
+                <FormField disabled={isLoading} control={form.control} name="password"
+                    render={({field}) => (
                         <FormItem>
                             <FormControl>
                                 <Input type="password" placeholder="Enter Password" {...field} />
@@ -100,7 +110,7 @@ const Signup = () => {
                     )} />
 
                 <FormField disabled={isLoading} control={form.control} name="confirmPassword"
-                    render={(field) => (
+                    render={({field}) => (
                         <FormItem>
                             <FormControl>
                                 <Input type="password" placeholder="Enter confirm password" {...field} />

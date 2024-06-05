@@ -19,7 +19,7 @@ export default function RootLayout({
 }>) {
     //console.log(db)
   return (
-    <html lang="en" className="light">
+    <html lang="en" className="dark" suppressHydrationWarning={true}>
       <body className={twMerge('bg-background',inter.className)}>
         <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
           {children}
