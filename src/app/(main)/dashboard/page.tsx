@@ -1,27 +1,48 @@
-import db from '@/lib/supabase/db'
-import { createClient } from '@/utils/supabase/server'
-import { redirect } from 'next/navigation'
-import React from 'react'
+import React from 'react';
+
+import db from '@/lib/supabase/db';
+import { redirect } from 'next/navigation';
+import DashboardSetup from '@/components/dashboard-setup/dashboard-setup';
+import { getUserSubscriptionStatus } from '@/lib/supabase/queries';
+import { createClient } from '@/utils/supabase/server';
 
 const DashboardPage = async () => {
-  const supabase = createClient()
+  const supabase = createClient();
 
-  const {data:{user}} = await supabase.auth.getUser()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
 
-  if(!user) return
+  if (!user) return;
 
-  const workspace = await await db.query.workspaces.findFirst({
-    where:(workspace, {eq})=>eq(workspace.workspaceOwner,user.id)
-  })
+  const workspace = await db.query.workspaces.findFirst({
+    where: (workspace, { eq }) => eq(workspace.workspaceOwner, user.id),
+  });
 
-  if(!workspace){
+  const { data: subscription, error: subscriptionError } =
+    await getUserSubscriptionStatus(user.id);
 
-    return
-  }
+  if (subscriptionError) return;
 
-  redirect(`/dashboard/${workspace.id}`)
+  if (!workspace)
+    return (
+      <div
+        className="bg-background
+        h-screen
+        w-screen
+        flex
+        justify-center
+        items-center
+  "
+      >
+        <DashboardSetup
+          user={user}
+          subscription={subscription}
+        />
+      </div>
+    );
 
+  redirect(`/dashboard/${workspace.id}`);
+};
 
-}
-
-export default DashboardPage
+export default DashboardPage;

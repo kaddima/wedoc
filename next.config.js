@@ -1,11 +1,11 @@
 /** @type {import('next').NextConfig} */
 
 const nextConfig = {
-    experimental:{
-      serverActions:true
-    },
+    // experimental:{
+    //   serverActions:true
+    // },
     images: {
-      domains: ['fmliqecnrxgzwvucipeu.supabase.co'],
+      domains: ['ckeelqgchtllpvymrhic.supabase.co'],
     },
   };
 
