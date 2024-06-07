@@ -1,11 +1,11 @@
 'use server'
 import { eq, notExists, and } from "drizzle-orm";
-import { files, workspaces, folders, users } from "../../../migrations/schema"
+import {files, workspaces, folders, users } from "../../../migrations/schema"
 import db from "./db"
-import { Folder, Subscription, workspace } from "./supabase.types"
+import { Folder, Subscription, workspace,File, User } from "./supabase.types"
 import { validate } from 'uuid';
 import { title } from "process";
-import { collaborators } from "./schema";
+import { collaborators} from "./schema";
 
 
 export const createWorkspace = async (workspace: workspace) => {
@@ -68,7 +68,7 @@ export const getFolders = async (workspaceId: string) => {
 }
 
 export const getPrivateWorkspaces = async (userId: string) => {
-	if (!userId) return
+	if (!userId) return []
 
 	const privateWorkspaces = await db.select({
 		id: workspaces.id,
@@ -96,7 +96,7 @@ export const getPrivateWorkspaces = async (userId: string) => {
 }
 
 export const getCollaboratingWorkspaces = async (userId:string)=>{
-	if (!userId) return
+	if (!userId) return []
 
 	const collaboratedWorkspaces = await db.select({
 		id: workspaces.id,
@@ -119,7 +119,7 @@ export const getCollaboratingWorkspaces = async (userId:string)=>{
 }
 
 export const getSharedWorkspaces = async (userId:string)=>{
-	if (!userId) return
+	if (!userId) return []
 
 	const sharedWorkspaces = await db.selectDistinct({
 		id: workspaces.id,
@@ -139,4 +139,19 @@ export const getSharedWorkspaces = async (userId:string)=>{
 
 	return sharedWorkspaces
 
+}
+
+export const addCollaborators = async (users:User[], workspaceId:string)=>{
+
+	const response = users.forEach(async (user:User)=>{
+		const userExists = await db.query.collaborators.findFirst({
+			where:(u, {eq})=>{
+				console.log(u)
+				return and(eq(u.userId, user.id), eq(u.workspaceId, workspaceId))}
+		})
+
+		if(!userExists){
+			await db.insert(collaborators).values({workspaceId,userId:user.id})
+		} 
+	})
 }
