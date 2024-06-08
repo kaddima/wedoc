@@ -1,6 +1,6 @@
 {
-  "id": "72f858e3-0a9f-4779-92fd-ce7021a5c0fc",
-  "prevId": "00000000-0000-0000-0000-000000000000",
+  "id": "0bcd1610-fe73-4078-9274-69d986a6debe",
+  "prevId": "72f858e3-0a9f-4779-92fd-ce7021a5c0fc",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
@@ -259,13 +259,6 @@
           "type": "uuid",
           "primaryKey": false,
           "notNull": true
-        },
-        "status": {
-          "name": "status",
-          "type": "subscription_status",
-          "typeSchema": "public",
-          "primaryKey": false,
-          "notNull": false
         },
         "metadata": {
           "name": "metadata",
