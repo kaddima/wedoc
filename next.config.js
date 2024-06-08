@@ -5,7 +5,14 @@ const nextConfig = {
     //   serverActions:true
     // },
     images: {
-      domains: ['ckeelqgchtllpvymrhic.supabase.co'],
+      remotePatterns: [
+        {
+          protocol: 'https',
+          hostname: 'ckeelqgchtllpvymrhic.supabase.co',
+          pathname: '**',
+        },
+      ],
+      // domains: [''],
     },
   };
 

@@ -55,6 +55,7 @@ export async function updateSession(request: NextRequest) {
 	)
 
 	const { data: { user } } = await supabase.auth.getUser()
+	//await supabase.auth.signOut()
 
 	if (request.nextUrl.pathname.startsWith('/dashboard')) {
 		if (!user) {
