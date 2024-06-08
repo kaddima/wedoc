@@ -1,17 +1,17 @@
 'use server'
-import { eq, notExists, and } from "drizzle-orm";
-import {files, workspaces, folders, users } from "../../../migrations/schema"
+import { eq, notExists, and, ilike } from "drizzle-orm";
+import { files, workspaces, folders, users } from "../../../migrations/schema"
 import db from "./db"
-import { Folder, Subscription, workspace,File, User } from "./supabase.types"
+import { Folder, Subscription, workspace, File, User } from "./supabase.types"
 import { validate } from 'uuid';
 import { title } from "process";
-import { collaborators} from "./schema";
+import { collaborators } from "./schema";
 
 
 export const createWorkspace = async (workspace: workspace) => {
 
 	try {
-		const response = await db.insert(workspaces).values(workspace)
+		await db.insert(workspaces).values(workspace)
 		return { data: null, error: null }
 	} catch (error) {
 		console.log(error)
@@ -89,13 +89,13 @@ export const getPrivateWorkspaces = async (userId: string) => {
 					.where(eq(collaborators.workspaceId, workspaces.id))
 			),
 			eq(workspaces.workspaceOwner, userId)
-			)
-		) as workspace[]
+		)
+	) as workspace[]
 
 	return privateWorkspaces
 }
 
-export const getCollaboratingWorkspaces = async (userId:string)=>{
+export const getCollaboratingWorkspaces = async (userId: string) => {
 	if (!userId) return []
 
 	const collaboratedWorkspaces = await db.select({
@@ -109,16 +109,16 @@ export const getCollaboratingWorkspaces = async (userId:string)=>{
 		logo: workspaces.logo
 
 	})
-	.from(users)
-	.innerJoin(collaborators, eq(users.id, collaborators.userId))
-	.innerJoin(workspaces, eq(collaborators.workspaceId,workspaces.id))
-	.where(eq(users.id, userId)) as workspace[]
+		.from(users)
+		.innerJoin(collaborators, eq(users.id, collaborators.userId))
+		.innerJoin(workspaces, eq(collaborators.workspaceId, workspaces.id))
+		.where(eq(users.id, userId)) as workspace[]
 
 	return collaboratedWorkspaces
 
 }
 
-export const getSharedWorkspaces = async (userId:string)=>{
+export const getSharedWorkspaces = async (userId: string) => {
 	if (!userId) return []
 
 	const sharedWorkspaces = await db.selectDistinct({
@@ -127,31 +127,41 @@ export const getSharedWorkspaces = async (userId:string)=>{
 		workspaceOwner: workspaces.workspaceOwner,
 		title: workspaces.title,
 		iconId: workspaces.iconId,
-		data:workspaces.data,
+		data: workspaces.data,
 		inTrash: workspaces.inTrash,
 		logo: workspaces.logo
 
 	})
-	.from(workspaces)
-	.orderBy(workspaces.createdAt)
-	.innerJoin(collaborators, eq(collaborators.workspaceId,workspaces.id))
-	.where(eq(workspaces.workspaceOwner, userId)) as workspace[]
+		.from(workspaces)
+		.orderBy(workspaces.createdAt)
+		.innerJoin(collaborators, eq(collaborators.workspaceId, workspaces.id))
+		.where(eq(workspaces.workspaceOwner, userId)) as workspace[]
 
 	return sharedWorkspaces
 
 }
 
-export const addCollaborators = async (users:User[], workspaceId:string)=>{
+export const addCollaborators = async (users: User[], workspaceId: string) => {
 
-	const response = users.forEach(async (user:User)=>{
+	const response = users.forEach(async (user: User) => {
 		const userExists = await db.query.collaborators.findFirst({
-			where:(u, {eq})=>{
-				console.log(u)
-				return and(eq(u.userId, user.id), eq(u.workspaceId, workspaceId))}
+			where: (u, { eq }) => {
+
+				return and(eq(u.userId, user.id), eq(u.workspaceId, workspaceId))
+			}
 		})
 
-		if(!userExists){
-			await db.insert(collaborators).values({workspaceId,userId:user.id})
-		} 
+		if (!userExists) {
+			await db.insert(collaborators).values({ workspaceId, userId: user.id })
+		}
 	})
+}
+
+export const getUsersFromSearch = async (email: string) => {
+	if (!email) return [];
+
+	const accounts = db.select().from(users)
+		.where(ilike(users.email, `${email}%`))
+		
+	return accounts
 }
