@@ -16,7 +16,7 @@ const DashboardPage = async () => {
   if (!user) return;
 
   const workspace = await db.query.workspaces.findFirst({
-    where: (workspace, { eq }) => eq(workspace.workspaceOwner, user.id),
+    where: (workspace, { eq }) => eq(workspace.workspace_owner, user.id),
   });
 
   const { data: subscription, error: subscriptionError } =
