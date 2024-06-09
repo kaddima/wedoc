@@ -23,7 +23,7 @@ export const useSupabaseUser = () => {
 interface supabaseUserProviderProps {
     children: React.ReactNode
 }
-export const supabaseUserProvider: React.FC<supabaseUserProviderProps> = ({
+export const SupabaseUserProvider: React.FC<supabaseUserProviderProps> = ({
     children
 }) => {
     const [user, setUser] = useState<AuthUser | null>(null)
